@@ -1,9 +1,11 @@
 package com.denismiagkov.walletservice.repository;
 
-import com.denismiagkov.walletservice.application.service.serviceImpl.Entry;
+import com.denismiagkov.walletservice.domain.model.Entry;
 import com.denismiagkov.walletservice.domain.model.Player;
 import com.denismiagkov.walletservice.init.DatabaseConnection;
 import com.denismiagkov.walletservice.repository.interfaces.PlayerDAO;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
 import java.sql.*;
 import java.util.*;
@@ -13,6 +15,8 @@ import java.util.*;
  * Класс отвечает за доступ к данным об игроках, хранящимся в базе данных. Предоставляет методы для создания,
  * чтения, обновления и удаления данных.
  */
+
+@Repository
 public class PlayerDAOImpl implements PlayerDAO {
 
     /**
@@ -21,17 +25,11 @@ public class PlayerDAOImpl implements PlayerDAO {
     DatabaseConnection dbConnection;
 
     /**
-     * Базовый конструктор класса
-     */
-    public PlayerDAOImpl() {
-        this.dbConnection = new DatabaseConnection();
-    }
-
-    /**
-     * Конструктор класса с параметром(для тестирования)
+     * Конструктор класса
      *
      * @param dbConnection подключение к базе данных
      */
+    @Autowired
     public PlayerDAOImpl(DatabaseConnection dbConnection) {
         this.dbConnection = dbConnection;
     }
@@ -174,12 +172,12 @@ public class PlayerDAOImpl implements PlayerDAO {
         return playerId;
     }
 
-    public static void main(String[] args) {
-        PlayerDAOImpl playerDAO = new PlayerDAOImpl();
-        int id = playerDAO.getPlayerId("ann");
-        System.out.println(id);
-    }
-
+    /**
+     * Метод возвращает игрока по его id
+     *
+     * @param id id игрока
+     * @return игрок
+     */
     public Player getPlayerById(int id) {
         String getPlayerId = "SELECT * FROM wallet.players WHERE id = ?";
         try (Connection connection = dbConnection.getConnection();
@@ -201,6 +199,12 @@ public class PlayerDAOImpl implements PlayerDAO {
     }
 
 
+    /**
+     * Метод возвращает игрока по его логину
+     *
+     * @param login логин игрока
+     * @return игрок
+     */
     public Player getPlayerByLogin(String login) {
         String getPlayerId = "SELECT * FROM wallet.entries WHERE login = ?";
         try (Connection connection = dbConnection.getConnection();
@@ -218,6 +222,13 @@ public class PlayerDAOImpl implements PlayerDAO {
         }
         return null;
     }
+
+    /**
+     * Метод возвращает комбинацию логин - пароль по логмну игрока
+     *
+     * @param login логин игрока
+     * @return комбинация логин-пароль
+     */
 
     public Entry getEntryByLogin(String login) {
         String getEntry = "SELECT * FROM wallet.entries WHERE login = ?";
